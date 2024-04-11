@@ -1,14 +1,15 @@
 import gspread
 from datetime import datetime
 from google.oauth2 import service_account
+from googleapiclient.discovery import build
 import os
 import time
 
 class bucket:
-   creds = None
-   gc = None
-   sh = None
-   worksheet = None
+  creds = None
+  gc = None
+  sh = None
+  worksheet = None
 
 
 class initializer:
@@ -43,6 +44,33 @@ class tools:
     now = datetime.now()
     year_month_time = now.strftime("%Y%m%d%H%M%S")
     return year_month_time
+
+class uploader:
+    def photo(image_name, upload_name):
+        '''make sure to include format of the file as well i.e.) .png '''
+        if initializer.PATH_CAPTURED_IMAGES == None or initializer.PATH_SERVICE_ACCOUNT_FILE == None or bucket.creds == None:
+            print("initialize first!")
+            print(f"[LOG] : {initializer.PATH_CAPTURED_IMAGES}")
+            print(f"[LOG] : {initializer.PATH_SERVICE_ACCOUNT_FILE}")
+            print(f"[LOG] : {bucket.creds}")
+            
+            exit()
+        
+        service = build('drive', 'v3', credentials=bucket.creds)
+
+        file_metadata = {
+            'name':f"{upload_name}",
+            'parents': [initializer.ID_PARENT_FOLDER]
+        }
+
+        file_path = os.path.join(initializer.PATH_CAPTURED_IMAGES, f'{image_name}')
+
+        file = service.files().create(
+            body=file_metadata,
+            media_body=file_path
+        ).execute()
+
+        print('uploaded!')
 
 class editor:
   endDateStr = "endDate"
@@ -104,7 +132,7 @@ class editor:
     return outputValue
     
     
-    
+
 # example token 016b59179
 # example inferenced value is "{'error': 'invalid_grant', 'error_description': 'Invalid JWT Signature.'}"
 
