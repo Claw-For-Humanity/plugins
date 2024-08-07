@@ -13,24 +13,26 @@ class bucket:
 
 
 class initializer:
-    SCOPES = ['https://www.googleapis.com/auth/drive'] # final
-
+    SCOPES = ['https://www.googleapis.com/auth/drive'] 
     PATH_SERVICE_ACCOUNT_FILE = None
     PATH_CAPTURED_IMAGES = None
-    ID_PARENT_FOLDER = None
+    ID_PARENT_SPREADSHEET = None
+    ID_PARENT_DRIVE = None
 
 
-    def __init__(DEFAULT_PATH, account_id, destination_parent_id):
-        '''example is
-        (default_base_folder, "cfh-hawkeye-xxxxxx", "xxxxxx (end of the addy)")'''
-        initializer.PATH_SERVICE_ACCOUNT_FILE = os.path.join(DEFAULT_PATH, 'data', f'{account_id}.json')
-        initializer.PATH_CAPTURED_IMAGES = os.path.join(DEFAULT_PATH, 'capturedImages')
-        initializer.ID_PARENT_FOLDER = destination_parent_id
+    def __init__(DEFAULT_PATH, identity, spreadsheet_url, drive_url):
+        ''' make sure to create ".creds" & ".imgs" folder on your base folder and put the cred json file into it.
+        example is
+        (default_base_folder, "cfh-hawkeye-xxxxxx", "xxxxxx (end of the spreadsheet addy)", "xxxxxx (end of the drive addy)")'''
+        initializer.PATH_SERVICE_ACCOUNT_FILE = os.path.join(DEFAULT_PATH, '.creds', f'{identity}.json')
+        initializer.PATH_CAPTURED_IMAGES = os.path.join(DEFAULT_PATH, '.imgs') 
+        initializer.ID_PARENT_SPREADSHEET = spreadsheet_url
+        initializer.ID_PARENT_DRIVE = drive_url
 
         # define creds and authenticate
         bucket.creds = initializer.authenticate()
         bucket.gc = gspread.authorize(bucket.creds)
-        bucket.sh = bucket.gc.open('DetectedOutput') # open_by_key is an alternative fo rhtis
+        bucket.sh = bucket.gc.open('DetectedOutput') # TODO: open_by_key is an alternative for this
         bucket.worksheet = bucket.gc.open('DetectedOutput').sheet1
 
 
@@ -45,6 +47,8 @@ class tools:
     year_month_time = now.strftime("%Y%m%d%H%M%S")
     return year_month_time
 
+
+# this class is specifically for uploading images on google drive.
 class uploader:
     def photo(image_name, upload_name):
         '''make sure to include format of the file as well i.e.) .png '''
@@ -60,7 +64,7 @@ class uploader:
 
         file_metadata = {
             'name':f"{upload_name}",
-            'parents': [initializer.ID_PARENT_FOLDER]
+            'parents': [initializer.ID_PARENT_DRIVE]
         }
 
         file_path = os.path.join(initializer.PATH_CAPTURED_IMAGES, f'{image_name}')
@@ -72,6 +76,8 @@ class uploader:
 
         print('uploaded!')
 
+
+# this entire class is specifically for google spreadsheet.
 class editor:
   endDateStr = "endDate"
   endTokenStr = "endToken"
@@ -99,15 +105,12 @@ class editor:
       worksheet.update_cell(tokenCell.row, tokenCell.col, f"{token}")
       worksheet.update_cell(dateCell.row, dateCell.col, f"{cell_session_time}")
 
-
     # enter new token and push cells to one cell bottom.
     worksheet.update_cell(dateCell.row + 1, dateCell.col, editor.endDateStr)
     worksheet.update_cell(tokenCell.row +1, tokenCell.col, editor.endTokenStr)
     worksheet.update_cell(dataCell.row + 1, dataCell.col, editor.endDataStr)
 
     
-
-  
   def colab_edit(infOut, token):
     '''for google colab
       stage two - google colab needs to inference pictures and upload data on spreadsheet
@@ -135,12 +138,3 @@ class editor:
 
 # example token 016b59179
 # example inferenced value is "{'error': 'invalid_grant', 'error_description': 'Invalid JWT Signature.'}"
-
-
-initializer.__init__('/Users/changbeankang/Claw_For_Humanity/HOS_II/Plugins/', 'cfh-hawkeye-c23853ec0580', '1OlbAmA_yr76eaoT217e3nyAdT9X7ZkBh')
-time.sleep(3)
-editor.mainInitiator("016b59179")
-time.sleep(3)
-editor.colab_edit("{'error': 'invalid_grant', 'error_description': 'Invalid JWT Signature.'}", "016b59179")
-time.sleep(3)
-editor.accessor("016b59179")
