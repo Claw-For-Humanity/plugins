@@ -41,13 +41,6 @@ class initializer:
         return creds
 
 
-class tools:
-  def current_time():
-    now = datetime.now()
-    year_month_time = now.strftime("%Y%m%d%H%M%S")
-    return year_month_time
-
-
 # this class is specifically for uploading images on google drive.
 class uploader:
     def photo(image_name, upload_name):
@@ -90,7 +83,7 @@ class editor:
       2. if they match, input current session time and token into the cell
       3. push one cells below'''
     worksheet = bucket.worksheet
-    cell_session_time = tools.current_time()
+    cell_session_time = datetime.now().strftime("%Y%m%d%H%M%S")
     print(f"current cell time is {cell_session_time}")
 
     # find date cell, token cell and data cell
