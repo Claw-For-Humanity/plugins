@@ -13,6 +13,7 @@ class bucket:
 
 
 class initializer:
+    '''initialize the serverCom plugin'''
     SCOPES = ['https://www.googleapis.com/auth/drive'] 
     PATH_SERVICE_ACCOUNT_FILE = None
     PATH_CAPTURED_IMAGES = None
@@ -41,8 +42,8 @@ class initializer:
         return creds
 
 
-# this class is specifically for uploading images on google drive.
-class uploader:
+class drive_uploader:
+    '''This class is specifically for uploading images on google drive.'''
     def photo(image_name, upload_name):
         '''make sure to include format of the file as well i.e.) .png '''
         if initializer.PATH_CAPTURED_IMAGES == None or initializer.PATH_SERVICE_ACCOUNT_FILE == None or bucket.creds == None:
@@ -71,7 +72,7 @@ class uploader:
 
 
 # this entire class is specifically for google spreadsheet.
-class editor:
+class gs_editor:
   endDateStr = "endDate"
   endTokenStr = "endToken"
   endDataStr = "endData"
@@ -87,9 +88,9 @@ class editor:
     print(f"current cell time is {cell_session_time}")
 
     # find date cell, token cell and data cell
-    dateCell = worksheet.find(editor.endDateStr)
-    tokenCell = worksheet.find(editor.endTokenStr)
-    dataCell = worksheet.find(editor.endDataStr)
+    dateCell = worksheet.find(gs_editor.endDateStr)
+    tokenCell = worksheet.find(gs_editor.endTokenStr)
+    dataCell = worksheet.find(gs_editor.endDataStr)
 
     # enter token cell
     if dateCell.col == 1 and tokenCell.col == 2 and dataCell.col ==3:
@@ -99,9 +100,9 @@ class editor:
       worksheet.update_cell(dateCell.row, dateCell.col, f"{cell_session_time}")
 
     # enter new token and push cells to one cell bottom.
-    worksheet.update_cell(dateCell.row + 1, dateCell.col, editor.endDateStr)
-    worksheet.update_cell(tokenCell.row +1, tokenCell.col, editor.endTokenStr)
-    worksheet.update_cell(dataCell.row + 1, dataCell.col, editor.endDataStr)
+    worksheet.update_cell(dateCell.row + 1, dateCell.col, gs_editor.endDateStr)
+    worksheet.update_cell(tokenCell.row +1, tokenCell.col, gs_editor.endTokenStr)
+    worksheet.update_cell(dataCell.row + 1, dataCell.col, gs_editor.endDataStr)
 
     
   def colab_edit(infOut, token):
@@ -127,7 +128,3 @@ class editor:
     print(f'output value is {outputValue}')
     return outputValue
     
-    
-
-# example token 016b59179
-# example inferenced value is "{'error': 'invalid_grant', 'error_description': 'Invalid JWT Signature.'}"
