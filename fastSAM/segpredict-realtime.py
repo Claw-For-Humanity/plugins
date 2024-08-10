@@ -47,7 +47,7 @@ while cap.isOpened():
         device=DEVICE,
         retina_masks=True,
         imgsz=1024,
-        conf=0.7, # confidence here
+        conf=0.7, # NOTE: confidence here
         iou=0.9,
     )
     print(f"\n\noutput is\n{everything_results}")
@@ -76,29 +76,8 @@ while cap.isOpened():
             
         prompt_process = FastSAMPrompt(frame, everything_results, device=DEVICE)
 
-        # # everything prompt
+        # everything prompt
         ann = prompt_process.everything_prompt()
-
-    # # bbox prompt
-    # # bbox default shape [0,0,0,0] -> [x1,y1,x2,y2]
-    # bboxes default shape [[0,0,0,0]] -> [[x1,y1,x2,y2]]
-    # ann = prompt_process.box_prompt(bbox=[200, 200, 300, 300])
-    # ann = prompt_process.box_prompt(bboxes=[[200, 200, 300, 300], [500, 500, 600, 600]])
-
-    # text prompt
-    # ann = prompt_process.text_prompt(text='a photo of a dog')
-
-    # # point prompt
-    # # points default [[0,0]] [[x1,y1],[x2,y2]]
-    # # point_label default [0] [1,0] 0:background, 1:foreground
-    # ann = prompt_process.point_prompt(points=[[620, 360]], pointlabel=[1])
-
-    # point prompt
-    # points default [[0,0]] [[x1,y1],[x2,y2]]
-    # point_label default [0] [1,0] 0:background, 1:foreground
-    # ann = prompt_process.point_prompt(points=[[620, 360]], pointlabel=[1])
-    
-
 
         end = time.perf_counter()
         total = end-start
