@@ -42,10 +42,12 @@ class initializer:
         return creds
 
 
-class drive_uploader:
+class drive_manager:
     '''This class is specifically for uploading images on google drive.'''
-    def photo(image_name, upload_name):
+    def upload_photo(image_name, upload_name = None):
         '''make sure to include format of the file as well i.e.) .png '''
+        if type(upload_name) == type(None):
+           upload_name = image_name
         if initializer.PATH_CAPTURED_IMAGES == None or initializer.PATH_SERVICE_ACCOUNT_FILE == None or bucket.creds == None:
             print("initialize first!")
             print(f"[LOG] : {initializer.PATH_CAPTURED_IMAGES}")
@@ -72,7 +74,7 @@ class drive_uploader:
 
 
 # this entire class is specifically for google spreadsheet.
-class gs_editor:
+class gs_manager:
   endDateStr = "endDate"
   endTokenStr = "endToken"
   endDataStr = "endData"
@@ -88,9 +90,9 @@ class gs_editor:
     print(f"current cell time is {cell_session_time}")
 
     # find date cell, token cell and data cell
-    dateCell = worksheet.find(gs_editor.endDateStr)
-    tokenCell = worksheet.find(gs_editor.endTokenStr)
-    dataCell = worksheet.find(gs_editor.endDataStr)
+    dateCell = worksheet.find(gs_manager.endDateStr)
+    tokenCell = worksheet.find(gs_manager.endTokenStr)
+    dataCell = worksheet.find(gs_manager.endDataStr)
 
     # enter token cell
     if dateCell.col == 1 and tokenCell.col == 2 and dataCell.col ==3:
@@ -100,9 +102,9 @@ class gs_editor:
       worksheet.update_cell(dateCell.row, dateCell.col, f"{cell_session_time}")
 
     # enter new token and push cells to one cell bottom.
-    worksheet.update_cell(dateCell.row + 1, dateCell.col, gs_editor.endDateStr)
-    worksheet.update_cell(tokenCell.row +1, tokenCell.col, gs_editor.endTokenStr)
-    worksheet.update_cell(dataCell.row + 1, dataCell.col, gs_editor.endDataStr)
+    worksheet.update_cell(dateCell.row + 1, dateCell.col, gs_manager.endDateStr)
+    worksheet.update_cell(tokenCell.row +1, tokenCell.col, gs_manager.endTokenStr)
+    worksheet.update_cell(dataCell.row + 1, dataCell.col, gs_manager.endDataStr)
 
     
   def colab_edit(infOut, token):
@@ -120,11 +122,28 @@ class gs_editor:
   def accessor(token):
     '''stage three - main brain needs to have access to the inferenced data
     returns string output value '''
+    outputValue = []
     worksheet = bucket.worksheet
     processedTokenCell = worksheet.find(f"{token}")
-    processedDataCell = worksheet.cell(processedTokenCell.row, processedTokenCell.col + 1)
-    outputValue = processedDataCell.value
-    print(f'token number:{token}')
-    print(f'output value is {outputValue}')
-    return outputValue
     
+
+    if type(processedTokenCell) == type(None):
+       print("couldn't find {}".format(token))
+       return None
+    
+    else:
+       time.sleep(5)
+       dataCell = worksheet.find("endData")
+       dRow = dataCell.row - processedTokenCell.row
+       for i in range(dRow):
+          cell = worksheet.cell(processedTokenCell.row+i, processedTokenCell.col + 1)
+          outputValue.append({'cellData': cell.value})
+
+
+    
+    # processedDataCell = worksheet.cell(processedTokenCell.row, processedTokenCell.col + 1)
+    # outputValue = processedDataCell.value
+    
+    print(f'row, col is r:{processedTokenCell.row} c:{processedTokenCell.col+1}')
+    
+    return outputValue

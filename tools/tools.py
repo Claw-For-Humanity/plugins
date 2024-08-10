@@ -30,7 +30,7 @@ def fingerprint():
         return random_string
 
 
-def converter(fastSam, is_fastSam_xywh=False):
+def sam_to_coordinates(fastSam, is_fastSam_xywh=False):
         '''converts fastSam output dictionary into list and returns lists of x,y,w,h'''
         output_list = []
 

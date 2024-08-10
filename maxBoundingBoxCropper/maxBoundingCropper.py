@@ -83,13 +83,3 @@ class main:
 
 
 
-
-## debugging
-a = [{'fingerprint': 'd0ohc3q1', 'plot': (468, 413, 553, 494)}, {'fingerprint': '7j8maf0n', 'plot': (690, 453, 770, 532)}, {'fingerprint': 'qzqa9zvw', 'plot': (103, 869, 192, 967)}, {'fingerprint': 'gk2gssec', 'plot': (0, 643, 207, 796)}, {'fingerprint': 'j8n8w4uy', 'plot': (0, 867, 28, 969)}, {'fingerprint': 'chwj53sw', 'plot': (926, 0, 963, 80)}, {'fingerprint': 'qrjzdab6', 'plot': (74, 1416, 268, 1468)}, {'fingerprint': 'r3llbko7', 'plot': (0, 643, 215, 968)}]
-
-bounding_list = tools.converter(a)
-
-img = cv2.imread('/Users/changbeankang/Claw_For_Humanity/HOS_II/Google-Circularnet-Integration/output/output.jpg')
-
-cropped_test1 = main.crop_image_test1((1080,1920), img, bounding_list)
-cropped_test2 = main.crop_image_test2((1080,1920), img, bounding_list)
