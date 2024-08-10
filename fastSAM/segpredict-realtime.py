@@ -47,7 +47,7 @@ while cap.isOpened():
         device=DEVICE,
         retina_masks=True,
         imgsz=1024,
-        conf=0.7, # NOTE: confidence here
+        conf=0.7, # confidence here
         iou=0.9,
     )
     print(f"\n\noutput is\n{everything_results}")
@@ -64,10 +64,10 @@ while cap.isOpened():
             box = box.xyxy.cpu().numpy()
 
             for b in box:
-                x, y, w, h = map(int, b)
-                x_center = (x + w) // 2
-                y_center = (y + h) // 2
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                x, y, x2, y2 = map(int, b)
+                x_center = (x + x2) // 2
+                y_center = (y + y2) // 2
+                cv2.rectangle(frame, (x, y), (x2, y2), (0, 255, 0), 2)
                 
                 # Draw a circle at the center of the bounding box
                 cv2.circle(frame, (x_center, y_center), radius=5, color=(0, 0, 255), thickness=-1)
@@ -76,8 +76,10 @@ while cap.isOpened():
             
         prompt_process = FastSAMPrompt(frame, everything_results, device=DEVICE)
 
-        # everything prompt
+        # # everything prompt
         ann = prompt_process.everything_prompt()
+
+
 
         end = time.perf_counter()
         total = end-start
