@@ -7,7 +7,7 @@ import tools
 
 class main:
     # NOTE: test 1 - working
-    def crop_image_test1(width_height, image, bounding_boxes):
+    def crop_image_coverage_area(width_height, image, bounding_boxes):
         img_width, img_height = width_height[0], width_height[1]
         crop_width, crop_height = 1024, 512 
         
@@ -47,7 +47,7 @@ class main:
 
 
     # NOTE: test2 - working
-    def crop_image_test2(width_height, image, bounding_boxes):
+    def crop_image_full_box(width_height, image, bounding_boxes):
         img_width, img_height = width_height[0], width_height[1]
         crop_width, crop_height = 1024,512
         
