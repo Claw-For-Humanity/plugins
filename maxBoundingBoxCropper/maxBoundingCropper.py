@@ -22,7 +22,7 @@ class main:
                 for (x, y, x2, y2) in bounding_boxes:
                     crop_x2, crop_y2 = cx + crop_width, cy + crop_height
                     
-                    # Check intersection
+                    # Check intersecting area
                     overlap_width = max(0, min(crop_x2, x2) - max(cx, x))
                     overlap_height = max(0, min(crop_y2, y2) - max(cy, y))
                     if overlap_width > 0 and overlap_height > 0:
