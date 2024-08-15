@@ -6,8 +6,8 @@ import cv2
 import sys
 import time
 
-sys.path.append('/Users/changbeankang/Claw_For_Humanity/HOS_II/plugins/tools')
-import tools
+sys.path.append('/Users/changbeankang/Claw_For_Humanity/HOS_II/Google-Circularnet-Integration/')
+from fingerprint import main as fingerprint
 
 class bucket:
     model = None
@@ -17,6 +17,7 @@ class bucket:
 
 
 class initialize:
+    
     def init(confidence=0.8):
         bucket.model = FastSAM('./weights/FastSAM-s.pt')
 
@@ -32,7 +33,7 @@ class initialize:
 
 
 class main:
-    def annotate(everything_results, is_plt=False, frame=None, debugging = False):
+    def annotate(everything_results, is_plt, frame=None, debugging = False):
         ''' if is_plot is set True, frame cannot be None'''
         
         print('\nentered annotate')
@@ -47,23 +48,21 @@ class main:
         else:
             frame = None
 
-        print(everything_results[0].masks.shape)
-        print(everything_results[0].boxes.shape)
-        print(everything_results[0].boxes[0].xyxy.cpu().numpy())
-        
+
         for box in everything_results[0].boxes:
             box = box.xyxy.cpu().numpy()
 
             for b in box:
-                x, y, x2, y2 = map(int, b)
-                x_center = (x + x2) // 2
-                y_center = (y + y2) // 2
+                x, y, w, h = map(int, b)
+                everything = (x,y,w,h)
+                x_center = (x + w) // 2
+                y_center = (y + h) // 2
                 
                 if is_plt:
-                    cv2.rectangle(frame, (x, y), (x2, y2), (0, 255, 0), 2)
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                     cv2.circle(frame, (x_center, y_center), radius=5, color=(0, 0, 255), thickness=-1)
                 
-                bucket.current_objects.append({'fingerprint':tools.fingerprint(),'plot':(x, y, x2, y2)}) # (fingerprint, center of objects)
+                bucket.current_objects.append({'fingerprint':fingerprint.generate(),'plot': everything}) # (fingerprint, center of objects)
 
         if is_plt:
             print('entered final img write process')
@@ -81,23 +80,37 @@ class main:
 
 
 
-    def inference(img, debugging = False):
-        '''img is not a path. cv2.imread() it'''
+    def inference(img_path, plt, debugging = False):
+        '''img_path has to be jpg format'''
         print('\nfastsam inference entered')
     
         if debugging:
             startTime = time.perf_counter()
 
+        IMAGE_PATH = img_path
 
         everything_results = bucket.model(
-            img,
+            IMAGE_PATH,
             device=bucket.DEVICE,
             retina_masks=True,
             imgsz=1024,
             conf=bucket.confidence,
             iou=0.9,
         )
-        
+        if plt and everything_results != None:
+            prompt_process = FastSAMPrompt(IMAGE_PATH, everything_results, device=bucket.DEVICE)
+
+
+            ann = prompt_process.point_prompt(points=[[620, 360]], pointlabel=[1])
+
+            prompt_process.plot(
+                annotations=ann,
+                output_path='./output/hello1.jpg',
+                mask_random_color=True,
+                better_quality=True,
+                retina=False,
+                withContours=True,
+            )
 
         if debugging:
             dTime = time.perf_counter() - startTime
@@ -105,7 +118,5 @@ class main:
 
         print('fastsam inference done\n')
 
-        if debugging:
-            return everything_results, dTime
-        else:
-            return everything_results
+        return everything_results
+
