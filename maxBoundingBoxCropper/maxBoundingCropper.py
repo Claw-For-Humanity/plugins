@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import sys
-sys.path.append('/Users/changbeankang/Claw_For_Humanity/HOS_II/plugins/tools/')
+sys.path.append('C:/GitHub/CFH/plugins/tools')
 import tools
 
 
@@ -47,9 +47,9 @@ class main:
 
 
     # NOTE: test2 - working
-    def crop_image_full_box(width_height, image, bounding_boxes):
-        img_width, img_height = width_height[0], width_height[1]
-        crop_width, crop_height = 1024,512
+    def crop_image_full_box(height_width, image, bounding_boxes):
+        img_height, img_width = height_width[0], height_width[1]
+        crop_width, crop_height = 1024, 512 # fixed
         
         max_coverage = 0
         best_crop = None
