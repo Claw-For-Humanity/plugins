@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import sys
-sys.path.append('C:/GitHub/CFH/plugins/tools')
+sys.path.append('/Users/changbeankang/Claw_For_Humanity/HOS_II/plugins/tools')
 import tools
 
 
