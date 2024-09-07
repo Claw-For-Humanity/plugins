@@ -55,7 +55,6 @@ class drive_manager:
            upload_name = image_name
         if initializer.PATH_SERVICE_ACCOUNT_FILE == None or bucket.creds == None:
             print("initialize first!")
-            print(f"[LOG] : {initializer.PATH_CAPTURED_IMAGES}")
             print(f"[LOG] : {initializer.PATH_SERVICE_ACCOUNT_FILE}")
             print(f"[LOG] : {bucket.creds}")
             
