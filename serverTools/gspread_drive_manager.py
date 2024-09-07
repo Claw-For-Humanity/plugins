@@ -16,7 +16,6 @@ class initializer:
     '''initialize the serverCom plugin'''
     SCOPES = ['https://www.googleapis.com/auth/drive'] 
     PATH_SERVICE_ACCOUNT_FILE = None
-    PATH_CAPTURED_IMAGES = None
     ID_PARENT_SPREADSHEET = None
     ID_PARENT_CIRCULARNET_DRIVE = None
     ID_PARENT_ARCHER_DRIVE = None
@@ -29,7 +28,6 @@ class initializer:
         if not os.path.exists(os.path.join(DEFAULT_PATH, '.creds')):
            print('')
         initializer.PATH_SERVICE_ACCOUNT_FILE = os.path.join(DEFAULT_PATH, '.creds', f'{identity}.json')
-        initializer.PATH_CAPTURED_IMAGES = os.path.join(DEFAULT_PATH, '.imgs') 
         initializer.ID_PARENT_SPREADSHEET = spreadsheet_url
         initializer.ID_PARENT_CIRCULARNET_DRIVE = cn_drive_url
         initializer.ID_PARENT_ARCHER_DRIVE = ac_drive_url
@@ -51,11 +49,11 @@ class initializer:
 
 class drive_manager:
     '''This class is specifically for uploading images on google drive.'''
-    def upload_photo(bckt_type, image_name, upload_name = None):
+    def upload_photo(bckt_type, image_name, path, upload_name = None):
         '''make sure to include format of the file as well i.e.) .png '''
         if type(upload_name) == type(None):
            upload_name = image_name
-        if initializer.PATH_CAPTURED_IMAGES == None or initializer.PATH_SERVICE_ACCOUNT_FILE == None or bucket.creds == None:
+        if initializer.PATH_SERVICE_ACCOUNT_FILE == None or bucket.creds == None:
             print("initialize first!")
             print(f"[LOG] : {initializer.PATH_CAPTURED_IMAGES}")
             print(f"[LOG] : {initializer.PATH_SERVICE_ACCOUNT_FILE}")
@@ -64,12 +62,15 @@ class drive_manager:
             exit()
         
         service = build('drive', 'v3', credentials=bucket.creds)
+        
+        # circularnet
         if bckt_type == 'cn':
           file_metadata = {
               'name':f"{upload_name}",
               'parents': [initializer.ID_PARENT_CIRCULARNET_DRIVE]
           }
 
+        # archer
         elif bckt_type == 'ac':
            file_metadata = {
               'name':f"{upload_name}",
@@ -79,11 +80,11 @@ class drive_manager:
         else:
            print('invalid type')
            return
-        file_path = os.path.join(initializer.PATH_CAPTURED_IMAGES, f'{image_name}')
+
 
         file = service.files().create(
             body=file_metadata,
-            media_body=file_path
+            media_body=path
         ).execute()
 
         print('uploaded!')
@@ -102,6 +103,13 @@ class gs_manager:
       2. if they match, input current session time and token into the cell
       3. push one cells below'''
     worksheet = bucket.worksheet
+    if type(worksheet) == type(None):
+       print('error! worksheet is {}'.format(worksheet))
+       return
+
+    else:
+       print('\n\nworksheet successfully opened!')
+       print(worksheet)
 
     # find date cell, token cell and data cell
     typeCell = worksheet.find(gs_manager.endTypeStr)
