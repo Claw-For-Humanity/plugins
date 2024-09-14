@@ -5,6 +5,7 @@ import torch
 import cv2
 import sys
 import time
+import os
 
 sys.path.append('/Users/changbeankang/Claw_For_Humanity/HOS_II/plugins/tools')
 import tools
@@ -18,7 +19,7 @@ class bucket:
 
 class initialize:
     def init(confidence=0.8):
-        bucket.model = FastSAM('./weights/FastSAM-s.pt')
+        bucket.model = FastSAM('./weights/FastSAM-x.pt')
 
         bucket.DEVICE = torch.device(
             "cuda"
@@ -32,7 +33,7 @@ class initialize:
 
 
 class main:
-    def annotate(everything_results, is_plt=False, frame=None, debugging = False):
+    def annotate(everything_results, out_name, is_plt=False, frame=None, debugging = False):
         ''' if is_plot is set True, frame cannot be None'''
         
         print('\nentered annotate')
@@ -70,7 +71,7 @@ class main:
             prompt_process = FastSAMPrompt(frame, everything_results, device=bucket.DEVICE)
             ann = prompt_process.everything_prompt()
             img = prompt_process.plot_to_result(frame, annotations=ann)
-            cv2.imwrite('./output/output.jpg', img)
+            cv2.imwrite(f'./output/{out_name}.png', img)
 
         if debugging:
             dTime = time.perf_counter() - startTime
@@ -109,3 +110,24 @@ class main:
             return everything_results, dTime
         else:
             return everything_results
+
+initialize.init(0.9)
+
+# inference all the files within samples folder
+samples_path = '/Users/changbeankang/Claw_For_Humanity/HOS_II/FastSAM-main/SAM_sample'
+
+i = 0
+
+for file_name in os.listdir(samples_path):
+    file_path = os.path.join(samples_path, file_name)
+    
+    output_path = f'/Users/changbeankang/Claw_For_Humanity/HOS_II/yolov10-main/output/default/{i}.png'
+    img = cv2.imread(file_path)
+    er = main.inference(img)
+
+    main.annotate(er, f'{i}', True, img)
+
+    i += 1
+
+
+
