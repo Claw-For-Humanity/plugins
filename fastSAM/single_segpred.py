@@ -7,8 +7,8 @@ import sys
 import time
 import os
 
-sys.path.append('/Users/changbeankang/Claw_For_Humanity/HOS_II/plugins/tools')
-import tools
+sys.path.append('..')
+from plugins.tools import tools
 
 class bucket:
     model = None
@@ -33,13 +33,10 @@ class initialize:
 
 
 class main:
-    def annotate(everything_results, out_name, is_plt=False, frame=None, debugging = False):
+    def annotate(everything_results, is_plt=False, frame=None, debugging = False):
         ''' if is_plot is set True, frame cannot be None'''
-        
-        print('\nentered annotate')
 
         if debugging:
-            print('debugging enabled')
             startTime = time.perf_counter()
 
         if is_plt:
@@ -48,9 +45,9 @@ class main:
         else:
             frame = None
 
-        print(everything_results[0].masks.shape)
-        print(everything_results[0].boxes.shape)
-        print(everything_results[0].boxes[0].xyxy.cpu().numpy())
+        # print(everything_results[0].masks.shape)
+        # print(everything_results[0].boxes.shape)
+        # print(everything_results[0].boxes[0].xyxy.cpu().numpy())
         
         for box in everything_results[0].boxes:
             box = box.xyxy.cpu().numpy()
@@ -67,16 +64,14 @@ class main:
                 bucket.current_objects.append({'fingerprint':tools.fingerprint(),'plot':(x, y, x2, y2)}) # (fingerprint, center of objects)
 
         if is_plt:
-            print('entered final img write process')
             prompt_process = FastSAMPrompt(frame, everything_results, device=bucket.DEVICE)
             ann = prompt_process.everything_prompt()
             img = prompt_process.plot_to_result(frame, annotations=ann)
-            cv2.imwrite(f'./output/{out_name}.png', img)
+            return img
 
         if debugging:
             dTime = time.perf_counter() - startTime
             print(f'took {dTime} to annotate')
-        print('annotation done\n')
         
         return bucket.current_objects
 
@@ -84,7 +79,6 @@ class main:
 
     def inference(img, debugging = False):
         '''img is not a path. cv2.imread() it'''
-        print('\nfastsam inference entered')
     
         if debugging:
             startTime = time.perf_counter()
@@ -104,30 +98,51 @@ class main:
             dTime = time.perf_counter() - startTime
             print(f'inference took {dTime}s')
 
-        print('fastsam inference done\n')
-
-        if debugging:
-            return everything_results, dTime
-        else:
-            return everything_results
+        return everything_results
 
 initialize.init(0.9)
 
 # inference all the files within samples folder
-samples_path = '/Users/changbeankang/Claw_For_Humanity/HOS_II/FastSAM-main/SAM_sample'
+samples_path = '/home/cfh/Desktop/ClawForHumanity/Sample-Images/Original'
 
 i = 0
+model = 's' # x s
 
 for file_name in os.listdir(samples_path):
     file_path = os.path.join(samples_path, file_name)
     
-    output_path = f'/Users/changbeankang/Claw_For_Humanity/HOS_II/yolov10-main/output/default/{i}.png'
+    output_path = f'/home/cfh/Desktop/ClawForHumanity/Sample-Images/FastSAM/{model}/{i}.jpg'
     img = cv2.imread(file_path)
-    er = main.inference(img)
+    er = main.inference(img, True)
 
-    main.annotate(er, f'{i}', True, img)
+    out = main.annotate(er, True, img, debugging=True)
+
+    cv2.imwrite(output_path, out)
 
     i += 1
 
 
 
+# x
+# inference took 1.5599915129996589s
+# inference took 0.149836483999934s
+# inference took 0.1308417729997018s
+# inference took 0.1455205689999275s
+# inference took 0.13117899999997462s
+# inference took 0.13650289499946666s
+# inference took 0.18033718500009854s
+# inference took 0.1367902129995855s
+# inference took 0.1383324830003403s
+# inference took 0.1368249500001184s
+
+# s
+# inference took 1.6261243779999859s
+# inference took 0.15214019300037762s
+# inference took 0.13081800300005852s
+# inference took 0.14513954399990325s
+# inference took 0.11584269699960714s
+# inference took 0.13429836700015585s
+# inference took 0.1711912789996859s
+# inference took 0.13169535999986692s
+# inference took 0.15734263800004555s
+# inference took 0.14123509999990347s
