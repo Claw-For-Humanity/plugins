@@ -113,15 +113,16 @@ class main:
         
         return img
 
-    def inference(img_path,out_path):
+    def inference(img_path):
         if bucket.initialized == False:
             print('generator not initialized. Make sure to Initialize!')
             initialize.__init__()
         
         img = Image.open(img_path)
+        img = img.resize((1024,1024))
         img = np.array(img.convert("RGB"))
 
-        masks = bucket.mask_generator(img)
+        masks = bucket.mask_generator.generate(img)
         
         print(len(masks))
         print(masks[0].keys())
@@ -131,15 +132,42 @@ class main:
         return masks2, img
 
 # example usage
-image_path = '/Users/changbeankang/Claw_For_Humanity/HOS_II/sam2/segment-anything-2-main/SAM_sample/IMG_2267.jpg'
-output_path = '/Users/changbeankang/Claw_For_Humanity/HOS_II/Sample-Images'
+# image_path = '/home/cfh/Desktop/ClawForHumanity/Sample-Images/Original'
+# output_path = '/home/cfh/Desktop/ClawForHumanity/Sample-Images/SAM2'
 
-# initialize
+# # initialize
+# initialize.__init__()
+
+# # inference
+# masks, img = main.inference(image_path)
+# out = main.put_anns(masks, img)
+
+# # write image
+# cv2.imwrite(output_path, out)
+
+
+
+
 initialize.__init__()
 
-# inference
-masks, img = main.inference(image_path, output_path)
-out = main.put_anns(masks, img)
+if not bucket.initialized: initialize.__init__()
 
-# write image
-cv2.imwrite(output_path, out)
+
+# inference all the files within samples folder
+samples_path = '/home/cfh/Desktop/ClawForHumanity/Sample-Images/Original'
+
+i = 0
+
+for file_name in os.listdir(samples_path):
+    file_path = os.path.join(samples_path, file_name)
+    
+    masks, img = main.inference(file_path)
+    out = main.put_anns(masks, img)
+
+    output_path = f'/home/cfh/Desktop/ClawForHumanity/Sample-Images/SAM2/{i}.jpg'
+
+
+
+    Image.fromarray(out).save(output_path)
+
+    i += 1
