@@ -47,17 +47,18 @@ def yolov10_inference_for_examples(image, model_path, image_size, conf_threshold
 
 
 # inference all the files within samples folder
-samples_path = '/Users/changbeankang/Claw_For_Humanity/HOS_II/yolov10-main/SAM_sample/'
+samples_path = '/home/cfh/Desktop/ClawForHumanity/Sample-Images/Original'
 
 i = 0
-
+# n s m b l x
+model = 'x'
 for file_name in os.listdir(samples_path):
     file_path = os.path.join(samples_path, file_name)
     
-    output_path = f'/Users/changbeankang/Claw_For_Humanity/HOS_II/yolov10-main/output/10x/{i}.png'
-    # n s m b l x
+    output_path = f'/home/cfh/Desktop/ClawForHumanity/Sample-Images/YoloV10/{model}/{i}.png'
+    
     a = yolov10_inference_for_examples(file_path,
-                               "yolov10x",
+                               f"yolov10{model}",
                                640,
                                0.25)
     
