@@ -7,7 +7,7 @@ import sys
 import time
 import os
 
-sys.path.append('/Users/changbeankang/Claw_For_Humanity/HOS_II/plugins/tools')
+sys.path.append('../plugins/tools')
 import tools
 
 class bucket:
@@ -117,13 +117,13 @@ initialize.init(mode, confidence=0.7,iou=0.4) # sweet spot is iou = 0.9 & confid
 
 
 # inference all the files within samples folder
-samples_path = '/Users/changbeankang/Claw_For_Humanity/HOS_II/FastSAM-main/SAM_sample'
+samples_path = '../Sample-Images/Original'
 
 i = 0
 
 for file_name in os.listdir(samples_path):
     file_path = os.path.join(samples_path, file_name)
-    out_path = f'/Users/changbeankang/Claw_For_Humanity/HOS_II/Sample-Images/FastSAM/{mode}/{i}.jpg'
+    out_path = f'../Sample-Images/FastSAM/{mode}/{i}.jpg'
 
     img = cv2.imread(file_path)
     er = main.inference(img)
