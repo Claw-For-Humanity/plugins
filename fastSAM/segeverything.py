@@ -19,6 +19,7 @@ class bucket:
 
 class initialize:
     def init(type,confidence=0.4, iou = 0.9):
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
         bucket.model = FastSAM(f'./weights/FastSAM-{type}.pt')
 
         bucket.DEVICE = torch.device(
@@ -73,23 +74,23 @@ class main:
 
         if is_msk:
             print('masking...')
-            prompt_process = FastSAMPrompt(img, er, device=bucket.DEVICE)
+            prompt_process = FastSAMPrompt(frame, everything_results, device=bucket.DEVICE)
             ann = prompt_process.everything_prompt()
-            out_img = prompt_process.plot(
+
+            frame = prompt_process.plot(
             annotations=ann,
             bboxes= None,
             points= None,
             point_label= None,
             withContours=True
             )
-            return out_img
         
         e_a = time.perf_counter()
 
         print(f'annotation took {e_a - i_a}s')
         
         if is_plt:
-            return img
+            return frame, bucket.current_objects
         else:
             return bucket.current_objects
 
@@ -111,31 +112,31 @@ class main:
 
         return everything_results
 
+## sample usage
+# mode = 's'
+# initialize.init(mode, confidence=0.7,iou=0.4) # sweet spot is iou = 0.9 & confidence = 0.8 or 0.9
 
-mode = 'x'
-initialize.init(mode, confidence=0.7,iou=0.4) # sweet spot is iou = 0.9 & confidence = 0.8 or 0.9
 
+# # inference all the files within samples folder
+# samples_path = '../Sample-Images/Original'
 
-# inference all the files within samples folder
-samples_path = '../Sample-Images/Original'
+# i = 0
 
-i = 0
+# for file_name in os.listdir(samples_path):
+#     file_path = os.path.join(samples_path, file_name)
+#     out_path = f'../Sample-Images/FastSAM/{mode}/{i}.jpg'
 
-for file_name in os.listdir(samples_path):
-    file_path = os.path.join(samples_path, file_name)
-    out_path = f'../Sample-Images/FastSAM/{mode}/{i}.jpg'
+#     img = cv2.imread(file_path)
+#     er = main.inference(img)
 
-    img = cv2.imread(file_path)
-    er = main.inference(img)
-
-    out_img = main.annotate(everything_results=er,
-                            is_plt=True,
-                            is_msk=False,
-                            frame=img)
+#     out_img = main.annotate(everything_results=er,
+#                             is_plt=True,
+#                             is_msk=False,
+#                             frame=img)
     
-    cv2.imwrite(out_path,out_img)
+#     cv2.imwrite(out_path,out_img)
 
-    i += 1
+#     i += 1
 
 
 
