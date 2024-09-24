@@ -1,5 +1,9 @@
 import cv2
+from PIL import Image
 import numpy as np
+import sys
+sys.path.append('../plugins/maxBoundingCropper')
+from maxBoundingCropper import main as cropper
 
 def resize_with_padding(np_img, target_resolution=(1024, 512), background_color=(0, 0, 0)):
     """
@@ -49,7 +53,32 @@ def resize_with_padding(np_img, target_resolution=(1024, 512), background_color=
     
     return padded_img
 
-# Example usage:
-# Assuming np_img is the input image loaded as a NumPy array
-# resized_img = resize_with_padding(np_img, (1024, 512), (0, 0, 0))
-# cv2.imwrite('output_image.jpg', resized_img)
+def size_handler(np_img, target_size, boxes, turn= True):
+    '''img has to be numpy array'''
+    (orig_height, orig_width) = np_img.shape[:2] # make ure that the img is np.arrary'ed
+    (target_height, target_width) = target_size
+    
+    # rotating part
+    if turn and target_height>target_width:
+        if orig_width>orig_height:
+            print('rotating...')
+            # np array -> pillow -> rotate -> np array
+            np_img = np.array(Image.fromarray(np_img).rotate(-90, expand=True))
+    
+    elif turn and target_width> target_height:
+        if orig_height>orig_width:
+            print('rotating...')
+            # np array -> pillow -> rotate -> np array
+            np_img = np.array(Image.fromarray(np_img).rotate(-90, expand=True))
+
+    else: pass
+
+    # padding part
+    np_img = resize_with_padding(np_img, (1024,int(orig_width/(orig_height/1024))))
+    np_img = cropper.crop_image_full_box(
+                    image= np_img,
+                    bounding_boxes= boxes
+                    )
+    
+    return np_img
+    

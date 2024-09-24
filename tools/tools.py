@@ -25,6 +25,7 @@ def current_time():
 
 def fingerprint():
         '''return random string composed of 8 characters randomly selected from a-z, 0-9'''
+        print('entered fingerprint')
         characters = string.ascii_lowercase + string.digits
         random_string = ''.join(random.choice(characters) for _ in range(8))
         return random_string
@@ -56,3 +57,15 @@ def find_largest_area(rectangles):
     largest_rectangle = max(rectangles, key=lambda r: r[2] * r[3])
     
     return largest_rectangle
+
+def generate_name():
+    # Get the current date in YYYYMMDD format
+    date_str = datetime.now().strftime("%Y%m%d")
+    
+    # Generate a random number (e.g., between 1000 and 9999)
+    randstr = fingerprint()
+    
+    # Combine date and random number
+    generated_name = f"{date_str}_{randstr}"
+    
+    return generated_name
