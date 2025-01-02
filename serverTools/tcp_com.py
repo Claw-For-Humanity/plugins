@@ -6,8 +6,7 @@
 import socket
 
 class tcp_com:
-
-    def start_server(host='0.0.0.0', port=22411):  # Bind to all available interfaces
+    def raspberry_pi(host='0.0.0.0', port=22411):  # Bind to all available interfaces
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind((host, port))
         server_socket.listen(1)
@@ -32,7 +31,7 @@ class tcp_com:
             conn.close()
             server_socket.close()
 
-    def client(host='169.254.221.247', port=22411):
+    def laptop(host='169.254.221.247', port=22411):
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((host, port))
         print(f"Connected to server at {host}:{port}")
